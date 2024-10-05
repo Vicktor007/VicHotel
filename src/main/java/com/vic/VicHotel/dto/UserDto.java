@@ -1,7 +1,6 @@
 package com.vic.VicHotel.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.vic.VicHotel.entity.Booking;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -16,5 +15,5 @@ public class UserDto {
     private String name;
     private String PhoneNumber;
     private String role;
-    private List<Booking> bookings = new ArrayList<>();
+    private List<BookingDto> bookings = new ArrayList<>();
 }
