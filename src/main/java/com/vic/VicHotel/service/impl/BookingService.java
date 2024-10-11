@@ -33,6 +33,11 @@ public class BookingService implements IBookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EmailService emailService;
+
+
+
 
     @Override
     public Response saveBooking(Long roomId, Long userId, Booking bookingRequest) {
@@ -56,6 +61,11 @@ public class BookingService implements IBookingService {
             String bookingConfirmationCode = Utils.generateRandomConfirmationCode(10);
             bookingRequest.setBookingConfirmationCode(bookingConfirmationCode);
             bookingRepository.save(bookingRequest);
+
+            String subject = "Vic Royal Room Booking Confirmation";
+            String text = "Your booking is confirmed. Your confirmation code is: " + bookingConfirmationCode;
+            emailService.sendMail(user.getEmail(),subject,text);
+
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setBookingConfirmationCode(bookingConfirmationCode);
