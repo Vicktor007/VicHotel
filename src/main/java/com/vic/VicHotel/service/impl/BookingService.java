@@ -36,6 +36,9 @@ public class BookingService implements IBookingService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private SmsService smsService;
+
 
 
 
@@ -63,8 +66,13 @@ public class BookingService implements IBookingService {
             bookingRepository.save(bookingRequest);
 
             String subject = "Vic Royal Room Booking Confirmation";
-            String text = "Your booking is confirmed. Your confirmation code is: " + bookingConfirmationCode;
+            String text = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: " + bookingConfirmationCode;
+
+            //Email message service
             emailService.sendMail(user.getEmail(),subject,text);
+
+            // sms text service
+            smsService.sendSms(user.getPhoneNumber(), text);
 
             response.setStatusCode(200);
             response.setMessage("successful");
