@@ -17,6 +17,7 @@ public class BookingDto {
     private int numOfChildren;
     private int totalNumberOfGuests;
     private String bookingConfirmationCode;
+    private String notificationMode;
     private UserDto user;
     private RoomDto room;
 }

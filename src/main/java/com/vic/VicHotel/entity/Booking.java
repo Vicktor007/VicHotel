@@ -31,6 +31,9 @@ public class Booking {
 
     private int totalNumberOfGuests;
     private String bookingConfirmationCode;
+    private String notificationMode;
+
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
@@ -49,9 +52,17 @@ public class Booking {
         calculateTotalNumberOfGuests();
     }
 
-    public void setNoOfChildren(@Min(value = 0, message = "Number of adults must not be less than 0") int noOfChildren) {
+    public void setNoOfChildren(@Min(value = 0, message = "Number of children must not be less than 0") int noOfChildren) {
         this.noOfChildren = noOfChildren;
         calculateTotalNumberOfGuests();
+    }
+
+    public void setNotificationMode(String mode) {
+        if (mode.equals("email") || mode.equals("sms")) {
+            this.notificationMode = mode;
+        } else {
+            throw new IllegalArgumentException("Invalid notification mode");
+        }
     }
 
     @Override
@@ -64,9 +75,11 @@ public class Booking {
                 ", numOfAdults=" + numOfAdults +
                 ", noOfChildren=" + noOfChildren +
                 ", totalNumberOfGuests=" + totalNumberOfGuests +
+                ", notificationMode='" + notificationMode + '\'' +
 
                 '}';
     }
+
 }
 
 

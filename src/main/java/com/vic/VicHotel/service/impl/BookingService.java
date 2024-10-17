@@ -67,15 +67,16 @@ public class BookingService implements IBookingService {
 
             String confirmationUrl = "http://localhost:3000/bookingDetails/" + bookingConfirmationCode;
             String subject = "Vic Royal Room Booking Confirmation";
-            String smsText = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: " + bookingConfirmationCode + "." + "Booking link is: " + confirmationUrl;
+            String smsText = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: " + bookingConfirmationCode + ". " + " " + " View your booking here: " + confirmationUrl;
 
             String text = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: <a href=\"" + confirmationUrl + "\">" + bookingConfirmationCode + "</a>";
-            //Email message service
-            emailService.sendMail(user.getEmail(),subject,text);
-
-            // sms text service
-            smsService.sendSms(user.getPhoneNumber(), smsText);
-
+            if (bookingRequest.getNotificationMode().equals("email")) {
+                //Email message service
+                emailService.sendMail(user.getEmail(), subject, text);
+            } else {
+                // sms text service
+                smsService.sendSms(user.getPhoneNumber(), smsText);
+            }
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setBookingConfirmationCode(bookingConfirmationCode);
