@@ -29,8 +29,11 @@ public class ForgottenPasswordService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Value("${frontend.url}")
+    @Value("${aws.frontend.url}")
     private String frontendUrl;
+
+//    @Value("${frontend.url}")
+//    private String frontendUrl;
 
 
     public Response forgotPassword(String email) {
@@ -43,10 +46,10 @@ public class ForgottenPasswordService {
 
             // Create Reset Token
             String resetToken = generateResetToken() + user.getId();
-            System.out.println(resetToken);
+
             // Hash token before saving to DB
             String hashedToken = passwordEncoder.encode(resetToken);
-            System.out.println(hashedToken);
+
             // Save Hashed Token to DB
             Token token = new Token();
             token.setUser(user);
