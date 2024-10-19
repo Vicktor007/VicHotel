@@ -1,0 +1,35 @@
+name: CICD
+
+on:
+  push:
+    branches: [deploy-to-ec2]
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Build Project
+        run: mvn clean install -DskipTests
+      - name: Login to docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build docker image
+        run: docker build -t Vicktor007/VicHotel .
+      - name: Publish image to docker hub
+        run: docker push Vicktor007/VicHotel:latest
+  deploy:
+    needs: build
+    run-on: [aws-ec2]
+    steps:
+      - name: Pull Image from docker hub
+        run: docker pull Vicktor007/VicHotel:latest
+      - name: Delete old container
+        run: docker rm -f vic-hotel-docker-container
+      - name: Run docker container
+        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container Vicktor007/VicHotel:latest

@@ -12,6 +12,7 @@ import com.vic.VicHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,8 @@ public class UserService  implements IUserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public Response register(User user) {
@@ -47,6 +49,17 @@ public class UserService  implements IUserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = userRepository.save(user);
             UserDto userDTO = Utils.mapUserEntityToUserDTO(savedUser);
+
+            String userEmail = user.getEmail(); // user's email
+            String adminEmail = "vicktord007@gmail.com"; // Administrator's email
+            String adminSubject = "New User Registration";
+            String adminText = "A new User with email " + userEmail + " has just registered an account";
+
+            // Check if the user is an admin
+            if (!user.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
+
+                emailService.sendMail(adminEmail, adminSubject, adminText);
+            }
             response.setStatusCode(200);
             response.setUser(userDTO);
         } catch (MyException e) {
@@ -138,8 +151,18 @@ public class UserService  implements IUserService {
         Response response = new Response();
 
         try {
-            userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new MyException("User Not Found"));
+           User user = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new MyException("User Not Found"));
             userRepository.deleteById(Long.valueOf(userId));
+            String userEmail = user.getEmail(); // user's email
+            String adminEmail = "vicktord007@gmail.com"; // Administrator's email
+            String adminSubject = "User Account Deleted";
+            String adminText = "User with email " + userEmail + " has deleted their account";
+
+            // Check if the user is an admin
+            if (!user.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
+
+                emailService.sendMail(adminEmail, adminSubject, adminText);
+            }
             response.setStatusCode(200);
             response.setMessage("successful");
 

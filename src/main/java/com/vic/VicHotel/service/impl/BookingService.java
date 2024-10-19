@@ -13,7 +13,9 @@ import com.vic.VicHotel.service.interfac.IBookingService;
 import com.vic.VicHotel.service.interfac.IRoomService;
 import com.vic.VicHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,7 +41,8 @@ public class BookingService implements IBookingService {
     @Autowired
     private SmsService smsService;
 
-
+    @Value("${aws.frontend.url}")
+    private String frontendUrl;
 
 
     @Override
@@ -65,18 +68,27 @@ public class BookingService implements IBookingService {
             bookingRequest.setBookingConfirmationCode(bookingConfirmationCode);
             bookingRepository.save(bookingRequest);
 
-            String confirmationUrl = "http://localhost:3000/bookingDetails/" + bookingConfirmationCode;
+            String userEmail = user.getEmail();
+            String confirmationUrl = frontendUrl +  "/bookingDetails/" + bookingConfirmationCode;
             String subject = "Vic Royal Room Booking Confirmation";
             String smsText = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: " + bookingConfirmationCode + ". " + " " + " View your booking here: " + confirmationUrl;
 
             String text = "Your booking is confirmed with Vic Royal Suites. Your confirmation code is: <a href=\"" + confirmationUrl + "\">" + bookingConfirmationCode + "</a>";
             if (bookingRequest.getNotificationMode().equals("email")) {
                 //Email message service
-                emailService.sendMail(user.getEmail(), subject, text);
+                emailService.sendMail(userEmail, subject, text);
             } else {
                 // sms text service
                 smsService.sendSms(user.getPhoneNumber(), smsText);
             }
+
+            String adminEmail = "vicktord007@gmail.com"; // Administrator's email
+            String adminSubject = "Room Reservation Notification";
+            String adminText = "User with email " + userEmail + " has booked a Reservation with us. The confirmation code is<a href=\"" + confirmationUrl + "\">" + bookingConfirmationCode + "</a>" ;
+            emailService.sendMail(adminEmail, adminSubject, adminText);
+
+
+
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setBookingConfirmationCode(bookingConfirmationCode);
@@ -140,13 +152,30 @@ public class BookingService implements IBookingService {
         return response;
     }
 
-    @Override
     public Response cancelBooking(Long bookingId) {
         Response response = new Response();
 
         try {
-            bookingRepository.findById(bookingId).orElseThrow(() -> new MyException("Booking Does Not Exist"));
+            Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new MyException("Booking Does Not Exist"));
+            User user = booking.getUser(); // Get the user associated with the booking
             bookingRepository.deleteById(bookingId);
+
+            String userEmail = user.getEmail(); // Get the user's email
+            String email = "vic-Royal@gmail.com";
+            String subject = "Vic Royal Cancelled Reservation";
+            String text = "Your reservation is cancelled with Vic Royal Suites. You can contact us here if it was an error: " + email;
+
+            // Email message service
+            emailService.sendMail(userEmail, subject, text);
+
+            // Check if the user is an admin
+            if (!user.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
+                String adminEmail = "vicktord007@gmail.com"; // Administrator's email
+                String adminSubject = "Cancelled Reservation Notification";
+                String adminText = "User with email " + userEmail + " has cancelled a Reservation.";
+                emailService.sendMail(adminEmail, adminSubject, adminText);
+            }
+
             response.setStatusCode(200);
             response.setMessage("successful");
 
@@ -161,6 +190,72 @@ public class BookingService implements IBookingService {
         }
         return response;
     }
+
+
+//    @Override
+//    public Response cancelBooking(Long bookingId) {
+//        Response response = new Response();
+//
+//        try {
+//            Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new MyException("Booking Does Not Exist"));
+//            User user = booking.getUser(); // Get the user associated with the booking
+//            bookingRepository.deleteById(bookingId);
+//
+//            String userEmail = user.getEmail(); // Get the user's email
+//            String email = "vic-Royal@gmail.com";
+//            String subject = "Vic Royal Cancelled Reservation";
+//            String text = "Your reservation is cancelled with Vic Royal Suites. You can contact us here if it was an error: " + email;
+//
+//            // Email message service
+//            emailService.sendMail(userEmail, subject, text);
+//
+//            response.setStatusCode(200);
+//            response.setMessage("successful");
+//
+//        } catch (MyException e) {
+//            response.setStatusCode(404);
+//            response.setMessage(e.getMessage());
+//
+//        } catch (Exception e) {
+//            response.setStatusCode(500);
+//            response.setMessage("Error Cancelling a booking: " + e.getMessage());
+//
+//        }
+//        return response;
+//    }
+
+
+//    public Response cancelBooking(Long bookingId) {
+//        Response response = new Response();
+//
+//        try {
+//            bookingRepository.findById(bookingId).orElseThrow(() -> new MyException("Booking Does Not Exist"));
+//            bookingRepository.deleteById(bookingId);
+//            User user = booking.g
+//
+//            String email = "vic-Royal@gmail.com";
+//            String subject = "Vic Royal Cancelled Reservation";
+//            String text = "Your reservation is cancelled  with Vic Royal Suites. You can contact Us here if it was an error : " + email;
+//
+//
+//
+//                //Email message service
+//                emailService.sendMail(user.getEmail(), subject, text);
+//
+//            response.setStatusCode(200);
+//            response.setMessage("successful");
+//
+//        } catch (MyException e) {
+//            response.setStatusCode(404);
+//            response.setMessage(e.getMessage());
+//
+//        } catch (Exception e) {
+//            response.setStatusCode(500);
+//            response.setMessage("Error Cancelling a booking: " + e.getMessage());
+//
+//        }
+//        return response;
+//    }
 
     private boolean roomIsAvailable(Booking bookingRequest, List<Booking> existingBookings) {
 
