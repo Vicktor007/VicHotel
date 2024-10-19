@@ -20,16 +20,16 @@ jobs:
       - name: Login to docker hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build docker image
-        run: docker build -t Vicktor007/VicHotel .
+        run: docker build -t Vicktor007/vichotel .
       - name: Publish image to docker hub
-        run: docker push Vicktor007/VicHotel:latest
+        run: docker push Vicktor007/vichotel:latest
   deploy:
     needs: build
     runs-on: [aws-ec2]
     steps:
       - name: Pull Image from docker hub
-        run: docker pull Vicktor007/VicHotel:latest
+        run: docker pull Vicktor007/vichotel:latest
       - name: Delete old container
         run: docker rm -f vic-hotel-docker-container
       - name: Run docker container
-        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container Vicktor007/VicHotel:latest
+        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container Vicktor007/vichotel:latest
