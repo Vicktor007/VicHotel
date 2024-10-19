@@ -25,7 +25,7 @@ jobs:
         run: docker push Vicktor007/VicHotel:latest
   deploy:
     needs: build
-    run-on: [aws-ec2]
+    runs-on: [aws-ec2]
     steps:
       - name: Pull Image from docker hub
         run: docker pull Vicktor007/VicHotel:latest
