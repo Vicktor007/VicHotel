@@ -54,4 +54,4 @@ jobs:
           -e TWILIO_SID=${{ secrets.TWILIO_SID }} \
           -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
           -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
-          docker.io/victor140/vichotel:latest
+          docker.io/victor140/vichotel
