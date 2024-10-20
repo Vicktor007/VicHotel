@@ -1,5 +1,5 @@
-name: CICD
 
+name: CICD
 
 on:
   push:
@@ -7,33 +7,41 @@ on:
 
 jobs:
   build:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
+
       - name: Build Project
         run: mvn clean install -DskipTests
+
       - name: Login to docker hub
-        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Build docker image
-        run: docker build -t Vicktor007/vichotel .
+        run: docker build -t docker.io/Vicktor007/vichotel:latest .
+
       - name: Publish image to docker hub
-        run: docker push Vicktor007/vichotel:latest
+        run: docker push docker.io/Vicktor007/vichotel:latest
+
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: ubuntu-latest
     steps:
       - name: Pull Image from docker hub
-        run: docker pull Vicktor007/vichotel:latest
+        run: docker pull docker.io/Vicktor007/vichotel:latest
+
       - name: Delete old container
         run: docker rm -f vic-hotel-docker-container
+
       - name: Run docker container
-        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container 
+        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container \
           \
           -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
           -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
@@ -48,4 +56,4 @@ jobs:
           -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
           -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
           
-          Vicktor007/vichotel:latest
+          docker.io/Vicktor007/vichotel:latest
