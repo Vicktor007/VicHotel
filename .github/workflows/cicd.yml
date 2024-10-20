@@ -33,4 +33,19 @@ jobs:
       - name: Delete old container
         run: docker rm -f vic-hotel-docker-container
       - name: Run docker container
-        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container Vicktor007/vichotel:latest
+        run: docker run -d -p 8080:8080 --name vic-hotel-docker-container 
+          \
+          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+          -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+          -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+          -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+          -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+          -e MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} \
+          -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+          -e FRONTEND_TESTING_URL=${{ secrets.FRONTEND_TESTING_URL }} \
+          -e AWS_FRONTEND_URL=${{ secrets.AWS_FRONTEND_URL }} \
+          -e TWILIO_SID=${{ secrets.TWILIO_SID }} \
+          -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
+          -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
+          
+          Vicktor007/vichotel:latest
