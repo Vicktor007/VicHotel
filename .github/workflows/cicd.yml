@@ -27,14 +27,13 @@ jobs:
         run: docker build -t docker.io/victor140/vichotel:latest .
 
       - name: Publish image to docker hub
-        run: docker push docker.io/victor140/vichotel:latest
-
+        run: docker push docker.io/victor140/vichotel
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Pull Image from docker hub
-        run: docker pull docker.io/victor140/vichotel:latest
+        run: docker pull docker.io/victor140/vichotel
 
       - name: Delete old container
         run: docker rm -f vic-hotel-docker-container
