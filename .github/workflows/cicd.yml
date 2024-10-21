@@ -24,11 +24,10 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build docker image
-        run: docker build -t victor140/vic-hotel-new .
+        run: docker build -t victor140/vic-hotel-new:new .
 
       - name: Publish image to docker hub
         run: docker push victor140/vic-hotel-new:new
-
 
   deploy:
     needs: build
