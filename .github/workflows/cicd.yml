@@ -37,11 +37,11 @@ jobs:
         run: docker pull victor140/vichotel:latest
 
       - name: Delete old container
-        run: docker rm -f vic-hotel-docker-container
+        run: docker rm -f vic-hotel
 
       - name: Run docker container
         run: |
-          docker run -d -p 8080:8080 --name vic-hotel-docker-container \
+          docker run -d -p 8080:8080 --name vic-hotel \
           -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
           -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
           -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
@@ -54,4 +54,4 @@ jobs:
           -e TWILIO_SID=${{ secrets.TWILIO_SID }} \
           -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
           -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
-          victor140/vichotel
+          victor140/vichotel:latest
