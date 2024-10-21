@@ -27,14 +27,14 @@ jobs:
         run: docker build -t victor140/vic-hotel-new .
 
       - name: Publish image to docker hub
-        run: docker push victor140/vic-hotel-new:latest
+        run: docker push victor140/vic-hotel-new:new
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Pull Image from docker hub
-        run: docker pull victor140/vic-hotel-new:latest
+        run: docker pull victor140/vic-hotel-new:new
 
       - name: Delete old container
         run: docker rm -f vic-hotel-new || true
@@ -54,4 +54,4 @@ jobs:
           -e TWILIO_SID=${{ secrets.TWILIO_SID }} \
           -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
           -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
-          victor140/vic-hotel-new:latest
+          victor140/vic-hotel-new:new
