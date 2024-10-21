@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Pull Image from docker hub
-        run: docker pull victor140/vichotel-new:latest
+        run: docker pull victor140/vic-hotel-new:latest
 
       - name: Delete old container
         run: docker rm -f vic-hotel-new
