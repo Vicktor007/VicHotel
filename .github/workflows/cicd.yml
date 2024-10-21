@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
       - name: Build Project
         run: mvn clean install -DskipTests
@@ -24,24 +24,24 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build docker image
-        run: docker build -t victor140/vichotel .
+        run: docker build -t victor140/vichotel-new .
 
       - name: Publish image to docker hub
-        run: docker push victor140/vichotel:latest
+        run: docker push victor140/vichotel-new:latest
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Pull Image from docker hub
-        run: docker pull victor140/vichotel:latest
+        run: docker pull victor140/vichotel-new:latest
 
       - name: Delete old container
-        run: docker rm -f vic-hotel
+        run: docker rm -f vic-hotel-new
 
       - name: Run docker container
         run: |
-          docker run -d -p 8080:8080 --name vic-hotel \
+          docker run -d -p 8080:8080 --name vic-hotel-new \
           -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
           -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
           -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
@@ -54,4 +54,4 @@ jobs:
           -e TWILIO_SID=${{ secrets.TWILIO_SID }} \
           -e TWILIO_AUTHTOKEN=${{ secrets.TWILIO_AUTHTOKEN }} \
           -e TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }} \
-          victor140/vichotel:latest
+          victor140/vichotel-new:latest
