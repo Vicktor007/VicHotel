@@ -37,7 +37,7 @@ jobs:
         run: docker pull victor140/vic-hotel-new:latest
 
       - name: Delete old container
-        run: docker rm -f vic-hotel-new
+        run: docker rm -f vic-hotel-new || true
 
       - name: Run docker container
         run: |
