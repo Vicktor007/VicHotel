@@ -29,6 +29,7 @@ jobs:
       - name: Publish image to docker hub
         run: docker push victor140/vic-hotel-new:new
 
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
